@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;500&family=Poppins:ital,wght@0,400;1,200;1,300&display=swap');
+*{
+  font-family: 'Noto Sans', sans-serif;
+  
+}
+
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.grip {
+  border-radius: 5px;
+  row-gap: 10px;
+  background-color: antiquewhite;
+} 
+
+.grip-question {
+  width: 100%;
+  background-color: #c2f5e6ef;
+  border-radius: 5px;
+  padding: 5px ;
+}
+
+.grip-question-prop {
+  gap: 10px;
+  height: 20px;
+  background-color: #c2f5e6ef;
+  border-radius: 5px;
+}
+
+.grip-question-prop h6{
+  margin-left: 10px;
+}
+
+.grip-replies{
+  margin-left: 30px;
+  margin-top: 3px;
+  height: min-content;
+  grid-column: auto;
+  background-color: #fcfccfc2;
+  border-radius: 10px;
+  padding-left: 3px;
+}
+
+.reply {
+  width: 85%;
+  
+}
+
+.grip-replies-props {
+  width: 15%;
+  
+}
+
+.reply-props {
+  margin-top: 10px;
+  gap: 20px;
+}
+
+p, span{
+  font-size: small;
+}
