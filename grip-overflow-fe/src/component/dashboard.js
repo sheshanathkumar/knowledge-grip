@@ -13,7 +13,7 @@ export default function Dashboard() {
     const [reply, setReply] = useState("");
     const [addReplyTo, setAddReplyTo] = useState('');
     const [author, setAuthor] = useState("");
-    const [questionUpvote,  setQuestionUpvote] = useState();
+    const [questionUpvote, setQuestionUpvote] = useState();
     const [questionDownvote, setQuestionDownvote] = useState();
     const [replyLike, setReplyLike] = useState();
     const [replyDislike, setReplyDisLike] = useState();
@@ -31,17 +31,17 @@ export default function Dashboard() {
 
     const replyObj = {
         "replyDesc": reply,
-        "replyBy" : author,
-        "replyLike" : 0,
-        "replyDislike" : 0
+        "replyBy": author,
+        "replyLike": 0,
+        "replyDislike": 0
     }
 
 
 
     const submitReply = (value) => {
-        let submitUrl = `http://localhost:9000/add-reply?question=${value}` ;
-        console.log(value +" "+ JSON.stringify(replyObj) +" " + submitUrl)
-        fetch (submitUrl, {
+        let submitUrl = `http://localhost:9000/add-reply?question=${value}`;
+        console.log(value + " " + JSON.stringify(replyObj) + " " + submitUrl)
+        fetch(submitUrl, {
             method: 'POST',
             headers: {
                 "Accept": "application/json",
@@ -49,20 +49,20 @@ export default function Dashboard() {
                 "Access-Control-Allow-Origin": "*"
             },
             body: JSON.stringify(replyObj)
-        }).then( (res)=> {
+        }).then((res) => {
             console.log(res);
-        } ).catch( (err) => {
+        }).catch((err) => {
             console.log(err.message);
         })
         setAddReplyClick('unset')
         setAuthor('');
         setReply('');
-        rawData.map( x => {
+        rawData.map(x => {
             if (x.id === value) {
                 x.replyEntities.push(replyObj)
             }
         })
-  
+
 
     }
 
@@ -82,11 +82,12 @@ export default function Dashboard() {
 
     return (
         <>
-            <div className='container' >
-                <Navbar page='dashboard-page' />
+            <Navbar page='dashboard-page' />
+            <div className='container my-1'>
+
                 <div className='row' >
 
-                    <div className='col'>
+                    {/* <div className='col'>
 
                         <div className='user-profile' >
                             <img src={User.image} className="img-thumbnail" alt="..."></img>
@@ -95,8 +96,8 @@ export default function Dashboard() {
                             <h5><FaRegIdBadge /> {User.reputation} </h5>
                         </div>
 
-                    </div>
-                    <div className='col-6' style={{ overflow: "scroll", height: "90vh" }}>
+                    </div> */}
+                    <div className='col-9' style={{ overflow: "scroll", height: "90vh" }}>
 
 
                         {rawData.map((question) => {
@@ -117,8 +118,8 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className='grip-question-prop d-flex'>
-                                        <p> <FaArrowUp />  {question.upvote} </p>
-                                        <p> <FaArrowDown /> {question.downvote} </p>
+                                        <p className='cursor-point'> <FaArrowUp />  {question.upvote} </p>
+                                        <p className='cursor-point'> <FaArrowDown /> {question.downvote} </p>
                                         <p> <FaPen /> {question.author} </p>
                                         <p> <FaStopwatch /> {question.time}</p>
                                     </div>
@@ -129,8 +130,8 @@ export default function Dashboard() {
 
 
                                         <div className='grip-replies-props'>
-                                            <p> <FcLike /> {rep.replyLike}</p>
-                                            <p> <FcDislike /> {rep.replyDislike}</p>
+                                            <p className='cursor-point'> <FcLike /> {rep.replyLike}</p>
+                                            <p className='cursor-point'> <FcDislike /> {rep.replyDislike}</p>
                                         </div>
                                         <div className='reply'>
                                             <div className='reply-desc'>
@@ -176,7 +177,7 @@ export default function Dashboard() {
 
                     </div>
 
-                    <div className='col'>
+                    <div className='col-3' style={{ backgroundColor: "#ffeecc", borderRadius: "5px" }}>
                         <h3>Top Questions</h3>
                         {rawData.map(que => {
                             return <>

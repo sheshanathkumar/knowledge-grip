@@ -76,3 +76,12 @@ p, span{
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   color: #5808c2;
 }
+
+.cursor-point :hover {
+  cursor: pointer;
+}
+
+.nav-style:hover {
+  background: #dcdadd;
+  border-radius: 5px;
+}

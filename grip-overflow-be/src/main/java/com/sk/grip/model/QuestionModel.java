@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -40,7 +41,11 @@ public class QuestionModel implements Serializable {
             model.setUpvote(x.getQUpvote());
             model.setDownvote(x.getQDownvote());
             model.setTag(StringUtils.isBlank(x.getTag()) ? null : x.getTag().replaceAll(" ", "").split(",") );
-            model.setReplyEntities(x.getReplies());
+
+            List<ReplyEntity> replies = x.getReplies();
+            replies.sort( (a,b) -> a.getReplyTime().compareTo(b.getReplyTime()));
+            model.setReplyEntities(replies);
+
             models.add(model);
         }  );
         return models;

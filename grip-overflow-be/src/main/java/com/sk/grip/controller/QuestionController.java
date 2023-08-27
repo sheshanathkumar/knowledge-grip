@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -42,6 +43,7 @@ public class QuestionController {
         } else {
             ques = ques.stream().sorted( (x,y) -> y.getQId().compareTo(x.getQId())  ).collect(Collectors.toList());
             List<QuestionModel> models = QuestionModel.of(ques);
+
             GripResponse response = new GripResponse(200, GripConstants.RESPONSE_SUCCESS, models);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
@@ -87,6 +89,71 @@ public class QuestionController {
     }
 
 
+    @GetMapping("/{qid}/upvote")
+    @Transactional
+    public ResponseEntity<GripResponse> upvoteQuestion ( @PathVariable(value = "qid") int qid) {
+        try {
+            QuestionEntity question = questionRepo.findByqId(qid);
+            question.setQUpvote(question.getQUpvote()+1 );
+            questionRepo.save(question);
+            return  new ResponseEntity<>( new GripResponse(200, GripConstants.RESPONSE_SUCCESS, "question id "+qid +" upvoted") , HttpStatus.OK );
+        }catch (Exception e) {
+            return new ResponseEntity<>(  new GripResponse(500, GripConstants.RESPONSE_FAILED, e.getLocalizedMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{qid}/downvote")
+    @Transactional
+    public ResponseEntity<GripResponse> downvoteQuestion ( @PathVariable(value = "qid") int qid) {
+        try {
+            QuestionEntity question = questionRepo.findByqId(qid);
+            question.setQDownvote(question.getQDownvote()+1 );
+            questionRepo.save(question);
+            return  new ResponseEntity<>( new GripResponse(200, GripConstants.RESPONSE_SUCCESS, "question id "+qid +" down-voted") , HttpStatus.OK );
+        }catch (Exception e) {
+            return new ResponseEntity<>(  new GripResponse(500, GripConstants.RESPONSE_FAILED, e.getLocalizedMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/{qid}/{reply-id}/like")
+    public ResponseEntity<GripResponse> likeReply (@PathVariable(value = "qid") int qid, @PathVariable(value = "reply-id") int replyId) {
+
+        try {
+            QuestionEntity question = questionRepo.findByqId(qid);
+            ReplyEntity replyEntity = question.getReplies().stream().filter(x -> x.getReplyId().equals(replyId)).findAny().orElse(null);
+            if (replyEntity != null) {
+                int like = replyEntity.getReplyLike() + 1;
+                replyRepo.updateLikeForReply(like, replyId, qid);
+                return  new ResponseEntity<>( new GripResponse(200, GripConstants.RESPONSE_SUCCESS, "reply liked") , HttpStatus.OK );
+            } else {
+                return new ResponseEntity<>(  new GripResponse(404, GripConstants.RESPONSE_FAILED, "Wrong reply-id! No reply found") , HttpStatus.NOT_FOUND);
+            }
+
+        }catch (Exception e) {
+            return new ResponseEntity<>(  new GripResponse(500, GripConstants.RESPONSE_FAILED, e.getLocalizedMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+
+    @GetMapping("/{qid}/{reply-id}/dislike")
+    public ResponseEntity<GripResponse> dislikeReply ( @PathVariable(value = "qid") int qid, @PathVariable(value = "reply-id") int replyId ){
+        try {
+            QuestionEntity question = questionRepo.findByqId(qid);
+            ReplyEntity replyEntity = question.getReplies().stream().filter(x -> x.getReplyId().equals(replyId)).findAny().orElse(null);
+            if (replyEntity != null) {
+                int dislike = replyEntity.getReplyDislike() + 1;
+                replyRepo.updateDislikeForReply(dislike, replyId, qid);
+                return  new ResponseEntity<>( new GripResponse(200, GripConstants.RESPONSE_SUCCESS, "reply disliked") , HttpStatus.OK );
+            } else {
+                return new ResponseEntity<>(  new GripResponse(404, GripConstants.RESPONSE_FAILED, "Wrong reply-id! No reply found") , HttpStatus.NOT_FOUND);
+            }
+
+        }catch (Exception e) {
+            return new ResponseEntity<>(  new GripResponse(500, GripConstants.RESPONSE_FAILED, e.getLocalizedMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
 
