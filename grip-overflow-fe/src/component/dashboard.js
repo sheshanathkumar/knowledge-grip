@@ -36,7 +36,56 @@ export default function Dashboard() {
         "replyDislike": 0
     }
 
+    const upvoteQuestion = (qid, upvote) => {
+        console.log(qid, upvote);
+        let url = `http://localhost:9000/${qid}/${upvote + 1}/upvote`;
+        console.log(url)
 
+        // fetch(url, {
+        //     method: 'GET',
+        //     headers: {
+        //         "Accept": "application/json",
+        //         "Content-Type": "application/json",
+        //         "Access-Control-Allow-Origin": "*"
+        //     }
+        // })
+        // .then((res) => res.json)
+        // .then((data) => {
+        //     if (data.status === 200) {
+        //         console.log(data.payload);
+        //     }
+        // });
+        console.log(rawData)
+        const currQuestion = rawData.find( x => x.id === qid )
+        
+
+        console.log(currQuestion);
+
+    }
+
+    const dowvoteQuestion = (qid, downvote) => {
+        console.log(qid, downvote);
+        let url = `http://localhost:9000/${qid}/${downvote + 1}/downvote`;
+        console.log(url)
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            }
+        })
+        .then((res) => res.json)
+        .then((data) => {
+            if (data.status === 200) {
+                console.log(data.payload);
+            }
+        });
+
+
+
+    }
 
     const submitReply = (value) => {
         let submitUrl = `http://localhost:9000/add-reply?question=${value}`;
@@ -63,7 +112,6 @@ export default function Dashboard() {
             }
         })
 
-
     }
 
     useEffect(() => {
@@ -72,7 +120,6 @@ export default function Dashboard() {
             .then((data) => {
                 if (data.status === 200) {
                     setRawData(data.payload);
-
                 }
 
             })
@@ -118,8 +165,8 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className='grip-question-prop d-flex'>
-                                        <p className='cursor-point'> <FaArrowUp />  {question.upvote} </p>
-                                        <p className='cursor-point'> <FaArrowDown /> {question.downvote} </p>
+                                        <p className='cursor-point' onClick={() => upvoteQuestion(question.id, question.upvote)}> <FaArrowUp />  {question.upvote} </p>
+                                        <p className='cursor-point' onClick={() => dowvoteQuestion(question.id, question.downvote)}> <FaArrowDown /> {question.downvote} </p>
                                         <p> <FaPen /> {question.author} </p>
                                         <p> <FaStopwatch /> {question.time}</p>
                                     </div>

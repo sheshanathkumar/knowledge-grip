@@ -9,18 +9,26 @@ import com.sk.grip.repo.ReplyRepo;
 import com.sk.grip.util.GripConstants;
 import com.sk.grip.util.GripUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
 public class QuestionController {
+
+    public final static Logger logger = LogManager.getLogger(QuestionController.class);
+
+    @Autowired
+    HttpServletRequest request;
 
     @Autowired
     QuestionRepo questionRepo;
@@ -89,28 +97,25 @@ public class QuestionController {
     }
 
 
-    @GetMapping("/{qid}/upvote")
-    @Transactional
-    public ResponseEntity<GripResponse> upvoteQuestion ( @PathVariable(value = "qid") int qid) {
+    @GetMapping("/{qid}/{upvote}/upvote")
+    public ResponseEntity<GripResponse> upvoteQuestion ( @PathVariable(value = "qid") int qid, @PathVariable(value = "upvote") int upvote) {
         try {
-            QuestionEntity question = questionRepo.findByqId(qid);
-            question.setQUpvote(question.getQUpvote()+1 );
-            questionRepo.save(question);
+            logger.info(request.getRequestURI());
+            questionRepo.updateUpvote(upvote, qid);
             return  new ResponseEntity<>( new GripResponse(200, GripConstants.RESPONSE_SUCCESS, "question id "+qid +" upvoted") , HttpStatus.OK );
         }catch (Exception e) {
+            logger.error(e.getMessage());
             return new ResponseEntity<>(  new GripResponse(500, GripConstants.RESPONSE_FAILED, e.getLocalizedMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/{qid}/downvote")
-    @Transactional
-    public ResponseEntity<GripResponse> downvoteQuestion ( @PathVariable(value = "qid") int qid) {
+    @GetMapping("/{qid}/{downvote}/downvote")
+    public ResponseEntity<GripResponse> downvoteQuestion ( @PathVariable(value = "qid") int qid, @PathVariable(value = "downvote") int downvote) {
         try {
-            QuestionEntity question = questionRepo.findByqId(qid);
-            question.setQDownvote(question.getQDownvote()+1 );
-            questionRepo.save(question);
+            questionRepo.updateDownvote(downvote, qid);
             return  new ResponseEntity<>( new GripResponse(200, GripConstants.RESPONSE_SUCCESS, "question id "+qid +" down-voted") , HttpStatus.OK );
         }catch (Exception e) {
+            logger.error(e.getMessage());
             return new ResponseEntity<>(  new GripResponse(500, GripConstants.RESPONSE_FAILED, e.getLocalizedMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
