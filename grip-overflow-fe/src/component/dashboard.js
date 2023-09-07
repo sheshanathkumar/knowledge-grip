@@ -1,23 +1,46 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, CSSProperties } from 'react'
 import Navbar from './navbar'
 import { questions, User } from '../component/data'
+import { HashLoader, ClipLoader } from 'react-spinners'
 
 import { FaArrowDown, FaArrowUp, FaHouseUser, FaPen, FaRegIdBadge, FaStopwatch } from 'react-icons/fa'
 import { FcDislike, FcLike } from 'react-icons/fc'
 import { GiSkills } from 'react-icons/gi'
+import { Navigate, useNavigate } from 'react-router'
 
 export default function Dashboard() {
 
-    const [rawData, setRawData] = useState([]);
+    const navigate = useNavigate();
+    const [rawData, setRawData] = useState(null);
     const [addReplyClick, setAddReplyClick] = useState(false);
     const [reply, setReply] = useState("");
     const [addReplyTo, setAddReplyTo] = useState('');
     const [author, setAuthor] = useState("");
+    let [loading, setLoading] = useState(true);
+    let [color, setColor] = useState("#000");
     const [questionUpvote, setQuestionUpvote] = useState();
     const [questionDownvote, setQuestionDownvote] = useState();
     const [replyLike, setReplyLike] = useState();
     const [replyDislike, setReplyDisLike] = useState();
+    const [popup, setPopup]= useState(false)
+    const [replyTime, setReplyTime] = useState("");
 
+    
+    const getCurrentTime = () => {
+        let currDate = "" + new Date( Date.now() );
+        let date = currDate.replace(' GMT+0530 (India Standard Time)', '');
+        setReplyTime(date);
+    }
+
+    const override = {
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        display: "flex",
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: "red",
+    };
 
     const toggleAddReply = (val) => {
         console.log(val)
@@ -27,13 +50,6 @@ export default function Dashboard() {
             setAddReplyClick('set')
             setAddReplyTo(val);
         }
-    }
-
-    const replyObj = {
-        "replyDesc": reply,
-        "replyBy": author,
-        "replyLike": 0,
-        "replyDislike": 0
     }
 
     const upvoteQuestion = (qid, upvote) => {
@@ -56,8 +72,8 @@ export default function Dashboard() {
         //     }
         // });
         console.log(rawData)
-        const currQuestion = rawData.find( x => x.id === qid )
-        
+        const currQuestion = rawData.find(x => x.id === qid)
+
 
         console.log(currQuestion);
 
@@ -76,18 +92,26 @@ export default function Dashboard() {
                 "Access-Control-Allow-Origin": "*"
             }
         })
-        .then((res) => res.json)
-        .then((data) => {
-            if (data.status === 200) {
-                console.log(data.payload);
-            }
-        });
+            .then((res) => res.json)
+            .then((data) => {
+                if (data.status === 200) {
+                    console.log(data.payload);
+                }
+            });
 
 
 
     }
 
     const submitReply = (value) => {
+        getCurrentTime();
+        const replyObj = {
+            "replyDesc": reply,
+            "replyBy": author,
+            "replyLike": 0,
+            "replyDislike": 0,
+            "replyTime": replyTime
+        }
         let submitUrl = `http://localhost:9000/add-reply?question=${value}`;
         console.log(value + " " + JSON.stringify(replyObj) + " " + submitUrl)
         fetch(submitUrl, {
@@ -121,35 +145,35 @@ export default function Dashboard() {
                 if (data.status === 200) {
                     setRawData(data.payload);
                 }
-
             })
+            .catch((err) => {
+                navigate("/error500")
+            }  )
     }, []);
-
 
 
     return (
         <>
             <Navbar page='dashboard-page' />
-            <div className='container my-1'>
+
+            {rawData ? <div className='container my-1 ' style={ {backgroundColor:'#f6f6ee'} }>
 
                 <div className='row' >
 
                     {/* <div className='col'>
 
-                        <div className='user-profile' >
-                            <img src={User.image} className="img-thumbnail" alt="..."></img>
-                            <h5> <FaHouseUser /> {User.name} </h5>
-                            <h5> <GiSkills /> {User.skill} </h5>
-                            <h5><FaRegIdBadge /> {User.reputation} </h5>
-                        </div>
+        <div className='user-profile' >
+            <img src={User.image} className="img-thumbnail" alt="..."></img>
+            <h5> <FaHouseUser /> {User.name} </h5>
+            <h5> <GiSkills /> {User.skill} </h5>
+            <h5><FaRegIdBadge /> {User.reputation} </h5>
+        </div>
 
-                    </div> */}
+    </div> */}
                     <div className='col-9' style={{ overflow: "scroll", height: "90vh" }}>
-
 
                         {rawData.map((question) => {
                             return <div className='grip' key={question.id} >
-
                                 <div className='grip-question'>
                                     <div className='ques-title'>
                                         <h5 >{question.title}</h5>
@@ -203,7 +227,7 @@ export default function Dashboard() {
                                             id="replyDescr" style={{ height: "200px" }}
                                             value={reply} onChange={(e) => setReply(e.target.value)}
                                         ></textarea>
-                                        <label for="floatingTextarea2">Reply</label>
+                                        <label htmlFor="floatingTextarea2">Reply</label>
 
                                         <div className="input-group d-flex my-2" >
                                             <input type="text" className="form-control" id="name"
@@ -218,21 +242,28 @@ export default function Dashboard() {
                                     : ""}
 
                             </div>
-
-                        })}
+                        })
+                        }
 
 
                     </div>
-
-                    <div className='col-3' style={{ backgroundColor: "#ffeecc", borderRadius: "5px" }}>
+                    {<div className='col-3' style={{ backgroundColor: "#f6f6ee", borderRadius: "5px" }}>
                         <h3>Top Questions</h3>
                         {rawData.map(que => {
                             return <>
-                                <p style={{ color: "blue" }} key={que.id} >{que.title}</p></>
+                                <p style={{ color: "blue" }} >{que.title}</p></>
                         })}
-                    </div>
+                    </div>}
+
                 </div>
-            </div>
+            </div> : <HashLoader
+                color={color}
+                loading={loading}
+                cssOverride={override}
+                size={150}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+            />}
         </>
     )
 

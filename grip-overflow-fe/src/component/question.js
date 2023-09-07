@@ -1,15 +1,27 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from './navbar'
 import { User } from '../component/data'
 import { FaHouseUser, FaRegIdBadge, } from 'react-icons/fa'
 import { GiSkills } from 'react-icons/gi'
+import { useNavigate } from 'react-router'
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal'
+
 
 export default function Question() {
 
+    const navigate = useNavigate();
     const [title, setTitle] = useState("");
     const [descr, setDescr] = useState("");
     const [tag, setTag] = useState("");
     const [author, setAuthor] = useState("");
+
+    const [show, setShow] = useState(false);
+    const [response, setResponse] = useState('');
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
 
     const question = {
         "qTitle": title,
@@ -32,11 +44,19 @@ export default function Question() {
                 "Access-Control-Allow-Origin": "*"
             },
             body: JSON.stringify(question)
-        }).then( (res) => {
-            console.log(res);
-        }).catch( (err) => {
-            console.log(err.message)
-        } );
+        }).then( (res) => res.json())
+        .then( (data) => {
+            console.log(data.payload)
+            setResponse(data.payload);
+            setShow(true);
+        })
+        .catch((err) => {
+            console.log(err)
+            setResponse(err.message);
+            setShow(true)
+        });
+
+        navigate("/");
     }
 
 
@@ -62,7 +82,7 @@ export default function Question() {
                                 placeholder='Question Title'
                                 value={title} onChange={(e) => setTitle(e.target.value)}
                             />
-                            <label for="floatingInput">Title</label>
+                            <label htmlFor="floatingInput">Title</label>
                         </div>
 
                         <div className="form-floating">
@@ -70,7 +90,7 @@ export default function Question() {
                                 id="questionDesc" style={{ height: "200px" }}
                                 value={descr} onChange={(e) => setDescr(e.target.value)}
                             ></textarea>
-                            <label for="floatingTextarea2">Describe your question</label>
+                            <label htmlFor="floatingTextarea2">Describe your question</label>
                         </div>
 
                         <h6 className='my-2'>add tags to the question, put tags in comma saperated format</h6>
@@ -86,9 +106,22 @@ export default function Question() {
                         <div className="input-group d-flex " >
                             <input type="text" className="form-control" id="name"
                                 placeholder='Your Name' value={author} onChange={(e) => setAuthor(e.target.value)} />
-                            <button type="button" className="btn btn-warning" onClick={submitQuestion} >Submit</button>
+                            <button type="button" className="btn btn-warning"
+                                onClick={() => submitQuestion()}
+
+                            >Submit</button>
                         </div>
 
+                        <Modal show={show} onHide={handleClose}>
+                            
+                            <Modal.Body>{response}</Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Close
+                                </Button>
+                                
+                            </Modal.Footer>
+                        </Modal>
 
                     </div>
 

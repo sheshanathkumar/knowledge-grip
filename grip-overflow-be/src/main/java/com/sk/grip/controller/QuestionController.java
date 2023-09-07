@@ -42,7 +42,8 @@ public class QuestionController {
     }
 
     @GetMapping("/all-question")
-    public ResponseEntity<GripResponse> fetchAllQuestion () {
+    public ResponseEntity<GripResponse> fetchAllQuestion () throws InterruptedException {
+        Thread.sleep(1000);
         List<QuestionEntity> ques =  questionRepo.findAll();
         if (ques.isEmpty()) {
 
@@ -61,9 +62,8 @@ public class QuestionController {
     public ResponseEntity<GripResponse> addReply (@RequestParam (name = "question") int qid, @RequestBody ReplyEntity reply) {
         System.out.println(reply);
         try {
-            if (StringUtils.isBlank(reply.getReplyTime())) {
-                reply.setReplyTime(GripUtil.convertDate(new Date()));
-            }
+
+            reply.setReplyTime(GripUtil.convertDate(new Date()));
             reply.setReplyLike(0);
             reply.setReplyDislike(0);
 
@@ -81,6 +81,11 @@ public class QuestionController {
     @PostMapping("/add-question")
     public ResponseEntity<GripResponse> addQuestion (@RequestBody QuestionEntity question) {
         try {
+
+            if (StringUtils.isBlank(question.getQTitle())){
+                throw new RuntimeException("No Question added");
+            }
+
             if (StringUtils.isBlank(question.getQTime())) {
                 question.setQTime(GripUtil.convertDate(new Date()));
             }
