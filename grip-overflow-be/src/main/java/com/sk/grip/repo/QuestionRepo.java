@@ -24,4 +24,7 @@ public interface QuestionRepo extends JpaRepository<QuestionEntity, Integer> {
     @Modifying
     public void updateDownvote (int downvote, int qid);
 
+    @Query(value = "select q_id, q_title, q_desc, q_author from grip_question ", nativeQuery = true)
+    public List<QuestionEntity> getAllQuestion ();
+
 }

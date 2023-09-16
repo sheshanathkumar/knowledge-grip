@@ -9,6 +9,4 @@ public class GripUtil {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mma");
         return dateFormat.format(date);
     }
-
-
 }

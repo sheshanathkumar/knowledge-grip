@@ -53,5 +53,10 @@ public class QuestionEntity {
     private List<ReplyEntity> replies;
 
 
-
+    public QuestionEntity(Integer qId, String qTitle, String qDesc, String qAuthor) {
+        this.qId = qId;
+        this.qTitle = qTitle;
+        this.qDesc = qDesc;
+        this.qAuthor = qAuthor;
+    }
 }
