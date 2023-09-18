@@ -73,8 +73,6 @@ export default function Dashboard() {
         // });
         console.log(rawData)
         const currQuestion = rawData.find(x => x.id === qid)
-
-
         console.log(currQuestion);
 
     }
@@ -144,6 +142,9 @@ export default function Dashboard() {
             .then((data) => {
                 if (data.status === 200) {
                     setRawData(data.payload);
+                }
+                if (data.status === 400){
+                    navigate("/notfound")
                 }
             })
             .catch((err) => {
